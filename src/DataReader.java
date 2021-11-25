@@ -11,9 +11,13 @@ public class DataReader {
     public String line = "";
     public String[] arr;
     public List<String> temp = new ArrayList<>();
-    public List<Double> row = new ArrayList<>();
+    public List<Integer> row = new ArrayList<>();
     public List<Field> fields = new ArrayList<>();
-    public List<List<Double>> landscape = new ArrayList<>();
+    public List<List<Integer>> landscape = new ArrayList<>();
+
+    public List<List<Field>> zweiD = new ArrayList<>();
+
+
 
     int count_x = 0;
     int count_y = 0;
@@ -29,23 +33,25 @@ public class DataReader {
         while((line = br.readLine()) != null) {
             arr = line.split(",");
             temp = Arrays.asList(arr);
-            row = temp.stream().map(Double::parseDouble).collect(Collectors.toCollection(ArrayList::new));
+            row = temp.stream().map(Integer::parseInt).collect(Collectors.toCollection(ArrayList::new));
             landscape.add(row);
         }
 
-        for(List<Double> list : landscape) {
+        for(List<Integer> list : landscape) {
             count_y = 0;
-            for(Double value : list) {
+            List<Field> zeile = new ArrayList<>();
+            for(Integer value : list) {
                 Field field = new Field(count_x, count_y++, value);
-                fields.add(field);
+                zeile.add(field);
             }
+            zweiD.add(zeile);
             count_x++;
         }
         System.out.println("Reading process finished!");
     }
 
-    public List<Field> getFields() {
-        return fields;
+    public List<List<Field>> getFields() {
+        return zweiD;
     }
 
     public static void pretty_print(List<Field> list) {
