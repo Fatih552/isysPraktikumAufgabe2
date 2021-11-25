@@ -12,15 +12,14 @@ public class Main {
 
         List<List<Field>> landscape = dataReader.getFields();
 
+        int temp = 0;
 
         for (int i = 0; i < landscape.size(); i++) {
             for (int j = 0; j < landscape.get(i).size(); j++) {
 
-
-
+                //todo naiver filter algorithmus
 
             }
         }
-
     }
 }

@@ -1,8 +1,9 @@
 public class Field {
 
-    public final int x;
-    public final int y;
-    public final int value;
+    public int x;
+    public int y;
+    public int value;
+    public boolean lokal_max = false;
 
     public Field(int x, int y, int value) {
         this.x = x;
@@ -12,6 +13,10 @@ public class Field {
 
     public String toString() {
         return "Koordinate: (" + x + "/" + y + ") value: " + value;
+    }
+
+    public void setLokal_max() {
+        lokal_max = true;
     }
 
 }
