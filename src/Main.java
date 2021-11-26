@@ -9,17 +9,12 @@ public class Main {
         //LabelReader labelReader = new LabelReader("ressources/label.csv");
         dataReader.init();
         //labelReader.init();
+        Agent bond = new Agent(dataReader.getFields());
 
-        List<List<Field>> landscape = dataReader.getFields();
+        System.out.println(bond.filter());
 
-        int temp = 0;
 
-        for (int i = 0; i < landscape.size(); i++) {
-            for (int j = 0; j < landscape.get(i).size(); j++) {
 
-                //todo naiver filter algorithmus
 
-            }
-        }
     }
 }
