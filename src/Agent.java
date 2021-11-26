@@ -17,19 +17,28 @@ public class Agent {
         int ny;
         int counter = 0;
 
-        for (int i = 0; i < 8; i++) {
-            nx = 1 + offset_x[i];
-            ny = 1 + offset_y[i];
-            if(landscape.get(nx).get(ny).value > landscape.get(1).get(1).value) {
-                landscape.get(1).get(1).lokal_max = false;
-                break;
+        for (int v = 0; v < landscape.size(); v++) {
+            for (int w = 0; w < landscape.get(v).size(); w++) {
+                for (int i = 0; i < 8; i++) {
+                    nx = v + offset_x[i];
+                    ny = w + offset_y[i];
+                    if(nx < 0 || ny < 0 || nx > landscape.size() - 1 || ny > landscape.get(v).size() - 1) continue;
+                    if(landscape.get(nx).get(ny).value > landscape.get(v).get(w).value) {
+                        landscape.get(v).get(w).lokal_max = false;
+                    }
+                    else landscape.get(v).get(w).setLokal_max();
+                }
             }
-            else landscape.get(1).get(1).setLokal_max();
         }
+
+
 
         for(int i = 0; i < landscape.size(); i++) {
             for(int j = 0; j < landscape.get(i).size(); j++) {
-                if (landscape.get(i).get(j).lokal_max) counter++;
+                if (landscape.get(i).get(j).lokal_max) {
+                    counter++;
+                    System.out.println(landscape.get(i).get(j).toString());
+                }
             }
         }
 
