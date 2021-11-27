@@ -17,7 +17,7 @@ public class Field {
      * @return String.
      */
     public String toString() {
-        return "Koordinate: (" + x + "/" + y + ") value: " + value;
+        return "Koordinate: (" + x + "/" + y + ") Wert: " + value;
     }
 
 
