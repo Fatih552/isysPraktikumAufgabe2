@@ -29,7 +29,6 @@ public class LabelReader {
             }
 
         }
-        System.out.println("Reading process finished!");
     }
 
     public static void pretty_print(List<Point> list) {

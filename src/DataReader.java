@@ -47,7 +47,6 @@ public class DataReader {
             zweiD.add(zeile);
             count_x++;
         }
-        System.out.println("Reading process finished!");
     }
 
     public List<List<Field>> getFields() {
