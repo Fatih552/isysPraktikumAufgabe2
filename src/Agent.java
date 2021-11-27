@@ -18,31 +18,37 @@ public class Agent {
         this.landscape = landscape;
         this.label = label;
         actualLabel = label.size();
+        filter();
     }
 
-    public int filter() {
+    public void filter() {
+
+        System.out.println("initialize values..");
 
         int[] offset_x = {-1, -1, -1, 0, 0, 1, 1, 1};
         int[] offset_y = {-1, 0, 1, -1, 1, -1, 0, 1};
         int nx;
         int ny;
-        int counter = 0;
 
 
         for (int v = 0; v < landscape.size(); v++) {
             for (int w = 0; w < landscape.get(v).size(); w++) {
+
                 int temp = 0;
                 List<Integer> neighbours = new ArrayList<>();
+
                 for (int i = 0; i < 8; i++) {
                     nx = v + offset_x[i];
                     ny = w + offset_y[i];
                     if(nx < 0 || ny < 0 || nx > landscape.size() - 1 || ny > landscape.get(v).size() - 1) continue;
                     else neighbours.add(landscape.get(nx).get(ny).value);
                 }
+
                 for(int i = 0; i < neighbours.size(); i++) {
                     temp = Math.max(neighbours.get(i), temp);
                 }
-                if(temp <= landscape.get(v).get(w).value) landscape.get(v).get(w).setLokal_max();
+
+                if(temp < landscape.get(v).get(w).value) landscape.get(v).get(w).setLokal_max();
             }
         }
 
@@ -51,19 +57,17 @@ public class Agent {
             for(int j = 0; j < landscape.get(i).size(); j++) {
                 if (landscape.get(i).get(j).lokal_max) {
                     precisionFoundLabel.add(landscape.get(i).get(j));
-                    System.out.println(landscape.get(i).get(j).toString());
-                    counter++;
                 }
             }
         }
 
-        foundLabel = counter;
-        return counter;
+        foundLabel = precisionFoundLabel.size();
 
     }
 
-    public int getFoundLabel() {
-        return foundLabel;
+    public void getFoundLabel() {
+        System.out.println("\nAnzahl gefundener lokaler Maxima: " + foundLabel);
+        precisionFoundLabel.forEach(System.out::println);
     }
 
     public int getActualLabel() {

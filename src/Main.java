@@ -10,7 +10,7 @@ public class Main {
         labelReader.init();
         Agent bond = new Agent(dataReader.getFields(), labelReader.getLabel());
 
-        System.out.println("Gesamt lokale Maxima: " + bond.filter());
+        bond.getFoundLabel();
 
 
 
