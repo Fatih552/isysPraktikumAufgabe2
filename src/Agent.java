@@ -1,17 +1,16 @@
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
 public class Agent {
 
-
     public List<List<Field>> landscape;
     public List<Point> label;
-    public List<Field> precisionFoundLabel = new ArrayList<>();
     public List<List<Field>> plateaus = new ArrayList<>();
+    public List<List<Field>> listOfFoundLabels = new ArrayList<>();
+    public List<List<Field>> listOfFoundLabelsTemp = new ArrayList<>();
     int foundLabel;
     int actualLabel;
     double recall;
@@ -37,11 +36,23 @@ public class Agent {
         for (int v = 0; v < landscape.size(); v++) {
             for (int w = 0; w < landscape.get(v).size(); w++) {
 
-                plateaus.add(findplateau(landscape.get(v).get(w)));
-
+                if(!landscape.get(v).get(w).visited) {
+                    setLokMaxPlateau(landscape.get(v).get(w));
+                }
             }
         }
 
+        //40 = schwellwert ab so einer steigung radius nehmen wir auf
+        //20 = radius welche werte ziehen wir in betracht
+        //alle plateaus die über einen schwellwert kommen sind potentielle labels
+        for(List<Field> plateau : plateaus) {
+            listOfFoundLabelsTemp.add(plateau);
+            if(plateau.get(plateau.size() / 2).relativeGradiant(20) > 115) {
+                if(plateau.get(plateau.size() / 2).relativeDistance(listOfFoundLabelsTemp) > 11) {
+                    listOfFoundLabels.add(plateau);
+                }
+            }
+        }
 
 
         /*
@@ -127,11 +138,11 @@ public class Agent {
 
          */
 
-        foundLabel = plateaus.size();
+        foundLabel = listOfFoundLabels.size();
 
     }
 
-    public List<Field> findplateau(Field field) {
+    public void setLokMaxPlateau(Field field) {
 
 
         List<Field> current = new ArrayList<>();
@@ -142,22 +153,32 @@ public class Agent {
 
         while(size != current.size()) {
 
-
             size = current.size();
             for(int i = 0; i < size; i++) {
                 current.addAll(current.get(i).findEqualNeighbours());
                 current = current.stream().distinct().collect(Collectors.toList());
             }
+
         }
 
+        for(Field field1 : current) {
+            field1.setVisited();
+            if(field1.checkHigherNeighbour()) {
+                return;
+            }
+        }
 
-        return current;
+        for(Field field1 : current) {
+            field1.setLokal_max();
+        }
+
+        plateaus.add(current);
 
     }
 
     public void getFoundLabel() {
         System.out.println("\nAnzahl gefundener lokaler Maxima: " + foundLabel);
-        plateaus.forEach(p -> p.forEach(System.out::println));
+        plateaus.forEach(System.out::println);
     }
 
     public int getActualLabel() {
@@ -177,9 +198,55 @@ public class Agent {
     }
 
     public void calculateRecall() {
+        int count = 0;
+
+        List<Field> result = new ArrayList<>();
+
+        for(int i = 0; i < listOfFoundLabels.size(); i++) {
+            for(int j = 0; j < listOfFoundLabels.get(i).size(); j++) {
+                int x = listOfFoundLabels.get(i).get(j).x;
+                int y = listOfFoundLabels.get(i).get(j).y;
+                Point temp = new Point(x, y);
+                if(label.contains(temp)) {
+                    count++;
+                    result.add(landscape.get(x).get(y));
+                    j = listOfFoundLabels.get(i).size();
+                }
+            }
+        }
+        List<Double> integers = new ArrayList<>();
+
+        for(Field field : result) {
+            integers.add(field.relativeDistance(listOfFoundLabels));
+        }
+
+        System.out.println("avg " + integers.stream().flatMapToDouble(aDouble -> DoubleStream.of(aDouble)).average());
+
+        recall = (double) count / label.size();
+        /*
         recall = (double) foundLabel / actualLabel;
+
+         */
     }
     public void calculatePrecision() {
+        int count = 0;
+
+        for(int i = 0; i < listOfFoundLabels.size(); i++) {
+            for(int j = 0; j < listOfFoundLabels.get(i).size(); j++) {
+                int x = listOfFoundLabels.get(i).get(j).x;
+                int y = listOfFoundLabels.get(i).get(j).y;
+                Point temp = new Point(x, y);
+                if(label.contains(temp)) {
+                    count++;
+                    j = listOfFoundLabels.get(i).size();
+                }
+            }
+        }
+
+        precision = (double) count / listOfFoundLabels.size();
+
+
+        /*
         List<Field> labelWerte = new ArrayList<>();
         int counter = 0;
 
@@ -202,10 +269,11 @@ public class Agent {
         }
 
         precision = (double) counter / precisionFoundLabel.size();
+        */
     }
 
     public void calculateFScore() {
-        fscore = 2 * getRecall() * getPrecision() / (getRecall() + getPrecision());
+        fscore = (2 * getRecall() * getPrecision()) / (getRecall() + getPrecision());
     }
 
     public void calculateStats() {
