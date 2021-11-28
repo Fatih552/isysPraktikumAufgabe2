@@ -10,7 +10,7 @@ public class Main {
         labelReader.init();
         Agent bond = new Agent(dataReader.getFields(), labelReader.getLabel());
 
-        bond.getFoundLabel();
+        bond.plateaus.forEach(System.out::println);
 
 
 

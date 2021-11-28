@@ -50,6 +50,7 @@ public class DataReader {
     }
 
     public List<List<Field>> getFields() {
+        zweiD.forEach(list -> list.forEach(field -> field.setLandscape(zweiD)));
         return zweiD;
     }
 

@@ -1,6 +1,9 @@
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Agent {
 
@@ -8,6 +11,7 @@ public class Agent {
     public List<List<Field>> landscape;
     public List<Point> label;
     public List<Field> precisionFoundLabel = new ArrayList<>();
+    public List<List<Field>> plateaus = new ArrayList<>();
     int foundLabel;
     int actualLabel;
     double recall;
@@ -21,7 +25,7 @@ public class Agent {
         filter();
     }
 
-    public void filter() {
+    public void filter() { //findlockmax
 
         System.out.println("initialize values..");
 
@@ -30,7 +34,65 @@ public class Agent {
         int nx;
         int ny;
 
+        for (int v = 0; v < landscape.size(); v++) {
+            for (int w = 0; w < landscape.get(v).size(); w++) {
 
+                plateaus.add(findplateau(landscape.get(v).get(w)));
+
+            }
+        }
+
+
+
+        /*
+        for (int v = 0; v < landscape.size(); v++) {
+            for (int w = 0; w < landscape.get(v).size(); w++) {
+
+                List<Field> neighbours = new ArrayList<>();
+                List<Field> plateau = new ArrayList<>();
+                Field temp = new Field(0,0,0);
+
+                for (int i = 0; i < 8; i++) {
+                    nx = v + offset_x[i];
+                    ny = w + offset_y[i];
+                    if(nx < 0 || ny < 0 || nx > landscape.size() - 1 || ny > landscape.get(v).size() - 1
+                    || landscape.get(v).get(w).visited) continue;
+                    else neighbours.add(landscape.get(nx).get(ny));
+
+                }
+
+                for(int i = 0; i < neighbours.size(); i++) {
+                    temp = Field.max(neighbours.get(i), temp);
+                }
+
+                if(temp.value <= landscape.get(v).get(w).value) {
+                    landscape.get(v).get(w).setLokal_max();
+                    landscape.get(v).get(w).visited = true;
+                    plateau.add(landscape.get(v).get(w));
+                    plateaus.add(plateau);
+
+
+                    for(int i = 0; i < neighbours.size(); i++) {
+
+                        if(neighbours.get(i).value == landscape.get(v).get(w).value) {
+                            landscape.get(v).get(w).setLokal_max();
+                            landscape.get(v).get(w).visited = true;
+                            plateau.add(landscape.get(v).get(w));
+                            plateaus.add(plateau);
+                        }
+
+                    }
+
+
+                }
+
+
+
+            }
+        }
+         */
+
+        /*
         for (int v = 0; v < landscape.size(); v++) {
             for (int w = 0; w < landscape.get(v).size(); w++) {
 
@@ -48,11 +110,13 @@ public class Agent {
                     temp = Math.max(neighbours.get(i), temp);
                 }
 
-                if(temp < landscape.get(v).get(w).value) landscape.get(v).get(w).setLokal_max();
+                if(temp <= landscape.get(v).get(w).value) landscape.get(v).get(w).setLokal_max();
             }
         }
 
+         */
 
+        /*
         for(int i = 0; i < landscape.size(); i++) {
             for(int j = 0; j < landscape.get(i).size(); j++) {
                 if (landscape.get(i).get(j).lokal_max) {
@@ -61,13 +125,39 @@ public class Agent {
             }
         }
 
-        foundLabel = precisionFoundLabel.size();
+         */
+
+        foundLabel = plateaus.size();
+
+    }
+
+    public List<Field> findplateau(Field field) {
+
+
+        List<Field> current = new ArrayList<>();
+
+        int size = 0;
+
+        current.add(field);
+
+        while(size != current.size()) {
+
+
+            size = current.size();
+            for(int i = 0; i < size; i++) {
+                current.addAll(current.get(i).findEqualNeighbours());
+                current = current.stream().distinct().collect(Collectors.toList());
+            }
+        }
+
+
+        return current;
 
     }
 
     public void getFoundLabel() {
         System.out.println("\nAnzahl gefundener lokaler Maxima: " + foundLabel);
-        precisionFoundLabel.forEach(System.out::println);
+        plateaus.forEach(p -> p.forEach(System.out::println));
     }
 
     public int getActualLabel() {
